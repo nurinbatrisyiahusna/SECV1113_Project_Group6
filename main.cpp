@@ -105,6 +105,14 @@ void shape(){
     line(300, 400, 430, 400);   		// right slant (_)
 }
 
+
+//? -------------------------------------------------------
+//?     DECORATIVE ELEMENT
+//?  1. fizzing bubbles
+//?  2. Ice
+//?  3. Tagline
+//? -------------------------------------------------------
+        
 void straw(){
     // Straw
     setcolor(BROWN);
@@ -127,13 +135,6 @@ void brandName(){
     outtextxy(303, 280, (char*)"COLA");
 }
 
-//? -------------------------------------------------------
-//?     DECORATIVE ELEMENT
-//?  1. fizzing bubbles
-//?  2. Ice
-//?  3. Tagline
-//? -------------------------------------------------------
-        
 void bubbles(){
     // Fizzing on top of the lid
     srand(time(0));
