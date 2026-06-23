@@ -4,7 +4,7 @@
 // STUDENT 1 : NAME: DHIVYESH KUMAR A/L SIVAKUMAR               MATRIC NO.: A25CS0212
 // STUDENT 2 : NAME: NAJWA NAJIBAH BINTI MOHAMAD NOR            MATRIC NO.: A25CS0288
 // STUDENT 3 : NAME: NURIN BATRISYIA HUSNA BINTI MOHD HAZRY     MATRIC NO.: A25CS0328
-// STUDENT 4 : NAME: TOR SI JIE    								MATRIC NO.: A25CS0369
+// STUDENT 4 : NAME: TOR SI JIE                                 MATRIC NO.: A25CS0369
 
 #include <graphics.h>
 #include <conio.h>
@@ -13,6 +13,22 @@
 #include <ctime>
 #include <cmath>
 #include <string>
+
+
+/*
+Many animation opportunities:
+
+Can slides in (Translation)
+Rotates slightly when appearing (Rotation)
+Enlarges for emphasis (Scaling)
+Brand text can tilt (Shearing)
+Bubbles can move upward using interpolation
+*/
+
+//! -------------------------------------------------------
+//?     TASK     : MATRIX TRANFORMATION
+//?     MEMBER 1 : TOR SI JIE
+//! -------------------------------------------------------
 
 typedef float Matrix3x3[3][3];
 
@@ -42,12 +58,14 @@ void multiplyMatrix(Matrix3x3 result, Matrix3x3 A, Matrix3x3 B) {
     }
 }
 
+// Linear Interpolation
 float lerp(float start, float end, float t) {
     if (t < 0.0f) t = 0.0f;
     if (t > 1.0f) t = 1.0f;
     return start + t * (end - start);
 }
 
+// Interpolation
 float trigonometricInterpolation(float start, float end, float t) {
     if (t < 0.0f) t = 0.0f;
     if (t > 1.0f) t = 1.0f;
@@ -55,19 +73,24 @@ float trigonometricInterpolation(float start, float end, float t) {
     return start + smoothFactor * (end - start);
 }
 
-main(){
-	// Create graphic window
-	initwindow(800, 700);
 
-	// set background
-    setbkcolor(BLACK);
-    cleardevice();
+//! -------------------------------------------------------
+//?     TASK     : 2D TRANSFORMATION, INTERPOLATION
+//?     MEMBER 2 : DHIVYESH KUMAR A/L SIVAKUMAR
+//! -------------------------------------------------------
 
+
+
+//! -------------------------------------------------------
+//?     TASK     : DESIGN PRODUCT, ELEMENTS
+//?     MEMBER 3 : NURIN BATRISYIA HUSNA BINTI MOHD HAZRY
+//! -------------------------------------------------------
 
 //? -------------------------------------------------------
 //?     PRODUCT OUTLINE - COCA COLA CAN DRINK
 //? -------------------------------------------------------
 
+void shape(){
     // Draw can shape
     // line (x1, y1, x2, y2)
     setcolor(RED);
@@ -80,7 +103,9 @@ main(){
     line(270, 360, 300, 400);   		// left curve (\)
     line(460, 360, 430, 400);   		// right curve (/)
     line(300, 400, 430, 400);   		// right slant (_)
+}
 
+void straw(){
     // Straw
     setcolor(BROWN);
     line(390, 70, 390, 150);
@@ -92,14 +117,15 @@ main(){
     line(410, 90, 390, 100);
     line(410, 110, 390, 120);
     line(410, 130, 390, 140);
+}
 
-
+void brandName(){
     // Display brand name
     setcolor(WHITE);
     settextstyle(GOTHIC_FONT, HORIZ_DIR, 4);
-    outtextxy(300, 230, "COCA");
-    outtextxy(303, 280, "COLA");
-
+    outtextxy(300, 230, (char*)"COCA");
+    outtextxy(303, 280, (char*)"COLA");
+}
 
 //? -------------------------------------------------------
 //?     DECORATIVE ELEMENT
@@ -108,6 +134,7 @@ main(){
 //?  3. Tagline
 //? -------------------------------------------------------
         
+void bubbles(){
     // Fizzing on top of the lid
     srand(time(0));
     setcolor(LIGHTBLUE);
@@ -117,25 +144,47 @@ main(){
         int y = 3 + rand() % 120;
         int r = 5 + rand() % 10;
         circle(x, y, r);
+        
+        setfillstyle(SOLID_FILL, LIGHTBLUE);
+        floodfill(x, y, LIGHTBLUE);
     }
-
+}
    
+void ice(){
     //Ice at the bottom can area
     setcolor(LIGHTGRAY);
-    rectangle(230, 350, 260, 380);
-    rectangle(210, 390, 240, 420);
-    rectangle(260, 390, 290, 420);
-    rectangle(500, 350, 530, 380);
-    rectangle(510, 390, 540, 420);
-    rectangle(460, 390, 490, 420);
-    rectangle(330, 400, 350, 420);
-    rectangle(360, 400, 380, 420);
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
 
-    
+    rectangle(230, 355, 260, 380);
+    floodfill(235, 360, LIGHTGRAY);
+
+    rectangle(215, 395, 240, 420);
+    floodfill(220, 400, LIGHTGRAY);
+
+    rectangle(265, 395, 290, 420);
+    floodfill(270, 400,LIGHTGRAY);
+
+    rectangle(505, 355, 530, 380);
+    floodfill(510, 360, LIGHTGRAY);
+
+    rectangle(515, 395, 540, 420);
+    floodfill(520, 400, LIGHTGRAY);
+
+    rectangle(465, 395, 490, 420);
+    floodfill(470, 400, LIGHTGRAY);
+
+    rectangle(335, 405, 350, 420);
+    floodfill(340, 410, LIGHTGRAY);
+
+    rectangle(365, 405, 380, 420);
+    floodfill(370, 410, LIGHTGRAY);
+}
+ 
+void tagline() {
     // Tagline
     setcolor(LIGHTRED);
     settextstyle(TRIPLEX_FONT, HORIZ_DIR, 3);
-    outtextxy(150, 470, "Real Magic - Taste the Feeling!");
+    outtextxy(150, 470, (char*)"Real Magic - Taste the Feeling!");
 
     // Wave inside the can
     setcolor(BROWN);
@@ -146,6 +195,31 @@ main(){
 
         line(x, y1, x + 1, y2);
     }
+}
+
+
+//! -------------------------------------------------------
+//?     TASK     : ANIMATION
+//?     MEMBER 4 : NAJWA NAJIBAH BINTI MOHAMAD NOR 
+//! -------------------------------------------------------
+
+
+
+
+//? -------------------------------------------------------
+//?     MAIN FUNCTION
+//? -------------------------------------------------------
+
+main(){
+	// Create graphic window
+	initwindow(800, 700);
+
+	// set background
+    setbkcolor(BLACK);
+    cleardevice();
+
+    
+
 
     getch();
     closegraph();
