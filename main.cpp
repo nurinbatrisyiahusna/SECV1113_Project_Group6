@@ -14,6 +14,47 @@
 #include <cmath>
 #include <string>
 
+typedef float Matrix3x3[3][3];
+
+void setIdentity(Matrix3x3 mat) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (i == j) mat[i][j] = 1.0f;
+            else mat[i][j] = 0.0f;
+        }
+    }
+}
+
+void multiplyMatrix(Matrix3x3 result, Matrix3x3 A, Matrix3x3 B) {
+    Matrix3x3 temp = {0};
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            temp[i][j] = 0.0f;
+            for (int k = 0; k < 3; k++) {
+                temp[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            result[i][j] = temp[i][j];
+        }
+    }
+}
+
+float lerp(float start, float end, float t) {
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+    return start + t * (end - start);
+}
+
+float trigonometricInterpolation(float start, float end, float t) {
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+    float smoothFactor = (1.0f - cos(t * 3.14159265f)) * 0.5f;
+    return start + smoothFactor * (end - start);
+}
+
 main(){
 	// Create graphic window
 	initwindow(800, 700);
