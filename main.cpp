@@ -79,7 +79,52 @@ float trigonometricInterpolation(float start, float end, float t) {
 //?     MEMBER 2 : DHIVYESH KUMAR A/L SIVAKUMAR
 //! -------------------------------------------------------
 
+//Translation
+void translate(Matrix3x3 current, float tx, float ty){
+	Matrix3x3 T;
+	setIdentity(T);
+	T[0][2] = tx;
+	T[1][2] = ty;
 
+	multiplyMatrix(current, T, current);
+}
+
+//Rotation
+void rotate(Matrix3x3 current, float angle) {
+	Matrix3x3 R;
+	setIdentity(R);
+
+	float radian = angle * 3.14159265f / 180.0f;
+	float cosTheta = cos(radian);
+	float sinTheta = sin(radian);
+
+	R[0][0] = cosTheta;
+	R[0][1] = -sinTheta;
+	R[1][0] = sinTheta;
+	R[1][1] = cosTheta;
+
+	multiplyMatrix(current, R, current);
+}
+
+//Scaling
+void scale(Matrix3x3 current, float sx, float sy){
+	Matrix3x3 S;
+	setIdentity(S);
+	S[0][0] = sx;
+	S[1][1] = sy;
+
+	multiplyMatrix(current, S, current);
+}
+
+//Shearing
+void shear(Matrix3x3 current, float shx, float shy){
+	Matrix3x3 Sh;
+	setIdentity(Sh);
+	Sh[0][1] = shx;
+	Sh[1][0] = shy;
+
+	multiplyMatrix(current, Sh, current);
+}
 
 //! -------------------------------------------------------
 //?     TASK     : DESIGN PRODUCT, ELEMENTS
