@@ -8,7 +8,6 @@
 
 #include <graphics.h>
 #include <conio.h>
-#include <winbgim.h>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
@@ -249,24 +248,56 @@ void tagline() {
 //?     MEMBER 4 : NAJWA NAJIBAH BINTI MOHAMAD NOR 
 //! -------------------------------------------------------
 
-
-
-
 //? -------------------------------------------------------
 //?     MAIN FUNCTION
 //? -------------------------------------------------------
-
-main(){
+void drawScene()
+{
+    shape();
+    straw();
+    brandName();
+    bubbles();
+    ice();
+    tagline();
+}
+int main(){
 	// Create graphic window
 	initwindow(800, 700);
+	bool startAnimation = false;
+
+    while(true)
+    {
+        if(kbhit())
+        {
+            char key = getch();
+
+            if(key=='s' || key=='S')
+                startAnimation = true;
+
+            if(key==27)
+                break;
+        }
 
 	// set background
     setbkcolor(BLACK);
     cleardevice();
+	drawScene();
+ 	if(startAnimation)
+        {
+            Matrix3x3 canMatrix;
+            setIdentity(canMatrix);
 
-    
+            rotate(canMatrix,10);
 
+            Matrix3x3 logoMatrix;
+            setIdentity(logoMatrix);
 
+            scale(logoMatrix,1.2,1.2);
+        }
+
+        delay(30);
+    }
     getch();
     closegraph();
+	return 0;
 }
