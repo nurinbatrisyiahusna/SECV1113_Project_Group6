@@ -13,21 +13,17 @@
 #include <cmath>
 #include <string>
 
-
-/*
-Many animation opportunities:
-
-Can slides in (Translation)
-Rotates slightly when appearing (Rotation)
-Enlarges for emphasis (Scaling)
-Brand text can tilt (Shearing)
-Bubbles can move upward using interpolation
-*/
-
-//! -------------------------------------------------------
-//?     TASK     : MATRIX TRANFORMATION
-//?     MEMBER 1 : TOR SI JIE
-//! -------------------------------------------------------
+bool startAnimation = false;
+int canOffsetX = -500;
+int shakeOffset = 0;
+int shakeCount = 0;
+bool strawBounce = false;
+int strawOffsetY = -250;	
+int stage = 0;
+int iceOffsetY = -450;
+float iceAngle = 0;
+float bubbleScale = 0.0f;
+bool showTagline = false;
 
 typedef float Matrix3x3[3][3];
 
@@ -71,13 +67,6 @@ float trigonometricInterpolation(float start, float end, float t) {
     float smoothFactor = (1.0f - cos(t * 3.14159265f)) * 0.5f;
     return start + smoothFactor * (end - start);
 }
-
-
-//! -------------------------------------------------------
-//?     TASK     : 2D TRANSFORMATION, INTERPOLATION
-//?     MEMBER 2 : DHIVYESH KUMAR A/L SIVAKUMAR
-//! -------------------------------------------------------
-
 //Translation
 void translate(Matrix3x3 current, float tx, float ty){
 	Matrix3x3 T;
@@ -124,180 +113,323 @@ void shear(Matrix3x3 current, float shx, float shy){
 
 	multiplyMatrix(current, Sh, current);
 }
-
-//! -------------------------------------------------------
-//?     TASK     : DESIGN PRODUCT, ELEMENTS
-//?     MEMBER 3 : NURIN BATRISYIA HUSNA BINTI MOHD HAZRY
-//! -------------------------------------------------------
-
-//? -------------------------------------------------------
-//?     PRODUCT OUTLINE - COCA COLA CAN DRINK
-//? -------------------------------------------------------
-
-void shape(){
-    // Draw can shape
-    // line (x1, y1, x2, y2)
-    setcolor(RED);
-    line(300, 150, 430, 150);		    // top surface (_)
-    line(294, 170, 435, 170);
-    line(300, 150, 270, 220);		    // left curve (/)
-    line(430, 150, 460, 220);		    // right curve (\)
-    line(270, 220, 270, 360);		    // left body (|)
-    line(460, 220, 460, 360);		    // right body (|)
-    line(270, 360, 300, 400);   		// left curve (\)
-    line(460, 360, 430, 400);   		// right curve (/)
-    line(300, 400, 430, 400);   		// right slant (_)
-}
-
-
-//? -------------------------------------------------------
-//?     DECORATIVE ELEMENT
-//?  1. fizzing bubbles
-//?  2. Ice
-//?  3. Tagline
-//? -------------------------------------------------------
-        
-void straw(){
-    // Straw
-    setcolor(BROWN);
-    line(390, 70, 390, 150);
-    line(410, 70, 410, 150);
-    line(390, 70, 410, 70);
-
-    // Straw pattern
-    line(410, 70, 390, 80);
-    line(410, 90, 390, 100);
-    line(410, 110, 390, 120);
-    line(410, 130, 390, 140);
-}
-
-void brandName(){
-    // Display brand name
+void shape(int offsetX)
+{
+    // Top can
     setcolor(WHITE);
-    settextstyle(GOTHIC_FONT, HORIZ_DIR, 4);
-    outtextxy(300, 230, (char*)"COCA");
-    outtextxy(303, 280, (char*)"COLA");
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(305 + offsetX, 150, 445 + offsetX, 160);
+
+    // Body can
+    setcolor(RED);
+    setfillstyle(SOLID_FILL, RED);
+    bar(300 + offsetX, 160, 450 + offsetX, 390);
+
+    // Bottom can
+    setcolor(WHITE);
+    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    bar(305 + offsetX, 390, 445 + offsetX, 400);
+
+    // Wave
+    setcolor(WHITE);
+
+    int baseX = 410 + offsetX;
+    int amp = 8;
+    float freq = 0.05;
+
+    for(int y = 170; y < 380; y++)
+    {
+        for(int w = -1; w <= 1; w++)
+        {
+            int x1 = baseX + w + (int)(amp * sin((y - 170) * freq));
+            int x2 = baseX + w + (int)(amp * sin((y + 1 - 170) * freq));
+
+            line(x1, y, x2, y + 1);
+        }
+    }
 }
 
-void bubbles(){
-    // Fizzing on top of the lid
-    srand(time(0));
+void brandName(int offsetX)
+{
+    // Red patch behind the text
+    setfillstyle(SOLID_FILL, RED);
+    bar(350 + offsetX, 190, 395 + offsetX, 355);
+
+    setbkcolor(RED);          // Only while drawing text
+    setcolor(WHITE);
+    settextstyle(GOTHIC_FONT, VERT_DIR, 2);
+
+    outtextxy(355 + offsetX, 280, (char*)"COCA");
+    outtextxy(355 + offsetX, 190, (char*)"COLA");
+
+    setbkcolor(BLACK);        // Restore for the rest of the scene
+}
+
+void straw(int offsetX, int offsetY)
+{
+    setcolor(BROWN);
+
+    // Straw body
+    line(390 + offsetX, 70 + offsetY,
+         390 + offsetX, 150 + offsetY);
+
+    line(410 + offsetX, 70 + offsetY,
+         410 + offsetX, 150 + offsetY);
+
+    line(390 + offsetX, 70 + offsetY,
+         410 + offsetX, 70 + offsetY);
+
+    // Straw stripes
+    line(410 + offsetX, 70 + offsetY,
+         390 + offsetX, 80 + offsetY);
+
+    line(410 + offsetX, 90 + offsetY,
+         390 + offsetX, 100 + offsetY);
+
+    line(410 + offsetX, 110 + offsetY,
+         390 + offsetX, 120 + offsetY);
+
+    line(410 + offsetX, 130 + offsetY,
+         390 + offsetX, 140 + offsetY);
+}
+
+void bubbles(int offsetX, float scale)
+{
     setcolor(LIGHTBLUE);
 
-    for(int i=0; i<10; i++){
-        int x = 300 + rand() % 150;
-        int y = 3 + rand() % 120;
-        int r = 5 + rand() % 10;
-        circle(x, y, r);
-        
-        setfillstyle(SOLID_FILL, LIGHTBLUE);
-        floodfill(x, y, LIGHTBLUE);
-    }
-}
-   
-void ice(){
-    //Ice at the bottom can area
-    setcolor(LIGHTGRAY);
-    setfillstyle(SOLID_FILL, LIGHTGRAY);
+    for(int i = 0; i < 10; i++)
+    {
+        int x = 300 + offsetX + rand() % 150;
+        int y = 30 + rand() % 120;
 
-    rectangle(230, 355, 260, 380);
-    floodfill(235, 360, LIGHTGRAY);
+        int r = (int)((5 + rand() % 10) * scale);
 
-    rectangle(215, 395, 240, 420);
-    floodfill(220, 400, LIGHTGRAY);
-
-    rectangle(265, 395, 290, 420);
-    floodfill(270, 400,LIGHTGRAY);
-
-    rectangle(505, 355, 530, 380);
-    floodfill(510, 360, LIGHTGRAY);
-
-    rectangle(515, 395, 540, 420);
-    floodfill(520, 400, LIGHTGRAY);
-
-    rectangle(465, 395, 490, 420);
-    floodfill(470, 400, LIGHTGRAY);
-
-    rectangle(335, 405, 350, 420);
-    floodfill(340, 410, LIGHTGRAY);
-
-    rectangle(365, 405, 380, 420);
-    floodfill(370, 410, LIGHTGRAY);
-}
- 
-void tagline() {
-    // Tagline
-    setcolor(LIGHTRED);
-    settextstyle(TRIPLEX_FONT, HORIZ_DIR, 3);
-    outtextxy(150, 470, (char*)"Real Magic - Taste the Feeling!");
-
-    // Wave inside the can
-    setcolor(BROWN);
-
-    for(int x = 290; x < 450; x++) {
-        int y1 = 345 + 8 * sin((x - 290) * 0.08);
-        int y2 = 345 + 8 * sin((x + 1 - 290) * 0.08);
-
-        line(x, y1, x + 1, y2);
+        if(r > 0)
+            circle(x, y, r);
     }
 }
 
+const float PI = 3.14159265f;
 
-//! -------------------------------------------------------
-//?     TASK     : ANIMATION
-//?     MEMBER 4 : NAJWA NAJIBAH BINTI MOHAMAD NOR 
-//! -------------------------------------------------------
-
-//? -------------------------------------------------------
-//?     MAIN FUNCTION
-//? -------------------------------------------------------
-void drawScene()
+void rotatePoint(int cx, int cy, int &x, int &y, float angle)
 {
-    shape();
-    straw();
-    brandName();
-    bubbles();
-    ice();
+    float rad = angle * PI / 180.0f;
+
+    float dx = x - cx;
+    float dy = y - cy;
+
+    int newX = cx + (int)(dx * cos(rad) - dy * sin(rad));
+    int newY = cy + (int)(dx * sin(rad) + dy * cos(rad));
+
+    x = newX;
+    y = newY;
+}
+void drawIceCube(int cx, int cy, int size, float angle)
+{
+    int x1 = cx - size;
+    int y1 = cy - size;
+
+    int x2 = cx + size;
+    int y2 = cy - size;
+
+    int x3 = cx + size;
+    int y3 = cy + size;
+
+    int x4 = cx - size;
+    int y4 = cy + size;
+
+    rotatePoint(cx, cy, x1, y1, angle);
+    rotatePoint(cx, cy, x2, y2, angle);
+    rotatePoint(cx, cy, x3, y3, angle);
+    rotatePoint(cx, cy, x4, y4, angle);
+
+    int poly[] =
+    {
+        x1,y1,
+        x2,y2,
+        x3,y3,
+        x4,y4,
+        x1,y1
+    };
+
+    setcolor(LIGHTGRAY);
+    setfillstyle(SOLID_FILL,LIGHTGRAY);
+
+    fillpoly(5, poly);
+}
+void ice(int offsetX, int offsetY, float angle)
+{
+    drawIceCube(245 + offsetX,370 + offsetY,15,angle);
+
+    drawIceCube(227 + offsetX,407 + offsetY,13,-angle);
+
+    drawIceCube(277 + offsetX,407 + offsetY,13,angle);
+
+    drawIceCube(517 + offsetX,370 + offsetY,13,-angle);
+
+    drawIceCube(527 + offsetX,407 + offsetY,13,angle);
+
+    drawIceCube(477 + offsetX,407 + offsetY,13,-angle);
+
+    drawIceCube(342 + offsetX,412 + offsetY,9,angle);
+
+    drawIceCube(372 + offsetX,412 + offsetY,9,-angle);
+}
+
+void tagline()
+{
+    setcolor(LIGHTRED);
+    settextstyle(TRIPLEX_FONT, HORIZ_DIR, 2);
+
+    char text[] = "Real Magic - Taste the Feeling!";
+
+    int textWidth = textwidth(text);
+
+    // Center under the can
+    int x = 375 - textWidth / 2;
+    int y = 440;
+
+    outtextxy(x, y, text);
+}
+void drawScene(int offsetX)
+{
+    shape(canOffsetX);
+	brandName(canOffsetX);
+	straw(canOffsetX, strawOffsetY);
+	bubbles(canOffsetX, bubbleScale);
+	ice(canOffsetX, iceOffsetY, iceAngle);
+
+	if(showTagline)
     tagline();
 }
-int main(){
-	// Create graphic window
-	initwindow(800, 700);
-	bool startAnimation = false;
-
-    while(true)
-    {
-        if(kbhit())
-        {
-            char key = getch();
-
-            if(key=='s' || key=='S')
-                startAnimation = true;
-
-            if(key==27)
-                break;
-        }
-
-	// set background
-    setbkcolor(BLACK);
+void startScreen()
+{
     cleardevice();
-	drawScene();
- 	if(startAnimation)
+
+    setcolor(WHITE);
+
+    settextstyle(DEFAULT_FONT, HORIZ_DIR, 2);
+    outtextxy(230, 320, (char*)"Press S to Start");
+
+    settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
+    outtextxy(285, 360, (char*)"Press ESC to Exit");
+}
+int main()
+{
+    initwindow(800,700);
+    srand(time(0));
+
+    startScreen();
+	
+	while(true)
+{
+    if(kbhit())
+    {
+        char key = getch();
+
+        if(key == 's' || key == 'S')
+            break;
+
+        if(key == 27)   // ESC
         {
-            Matrix3x3 canMatrix;
-            setIdentity(canMatrix);
-
-            rotate(canMatrix,10);
-
-            Matrix3x3 logoMatrix;
-            setIdentity(logoMatrix);
-
-            scale(logoMatrix,1.2,1.2);
+            closegraph();
+            return 0;
         }
-
-        delay(30);
     }
+
+    delay(20);
+}
+    while(true)
+{
+    cleardevice();
+
+    // Animation
+    if(stage == 0)
+    {
+        canOffsetX += 8;
+
+        if(canOffsetX >= 0)
+        {
+            canOffsetX = 0;
+            stage = 1;
+        }
+    }else if(stage == 1)
+{
+    if(!strawBounce)
+    {
+        // Falling
+        strawOffsetY += 8;
+
+        if(strawOffsetY >= 0)
+        {
+            strawOffsetY = 10;      // Go slightly below
+            strawBounce = true;
+        }
+    }
+    else
+    {
+        // Bounce back up
+        strawOffsetY -= 2;
+
+        if(strawOffsetY <= 0)
+        {
+            strawOffsetY = 0;
+            stage = 2;              // Continue to bubbles
+        }
+    }
+
+}else if(stage == 2)
+{
+    // Shake the can for a short time
+    if(shakeCount < 12)
+    {
+        if(shakeCount % 2 == 0)
+            shakeOffset = -4;
+        else
+            shakeOffset = 4;
+
+        shakeCount++;
+    }
+    else
+    {
+        shakeOffset = 0;
+
+        // Start bubble animation
+        bubbleScale += 0.08f;
+
+        if(bubbleScale >= 1.2f)
+        {
+            bubbleScale = 1.2f;
+            stage = 3;
+        }
+    }
+}else if(stage == 3)
+{
+    iceOffsetY += 6;
+    iceAngle += 8;
+
+    if(iceOffsetY >= 0)
+    {
+        iceOffsetY = 0;
+        showTagline = true;
+        stage = 4;
+    }
+}
+
+    // Draw objects
+    shape(canOffsetX + shakeOffset);
+	brandName(canOffsetX + shakeOffset);
+	straw(canOffsetX + shakeOffset, strawOffsetY);
+	bubbles(canOffsetX + shakeOffset, bubbleScale);
+	ice(canOffsetX + shakeOffset, iceOffsetY, iceAngle);
+
+	if(showTagline)
+    tagline();
+
+    delay(30);
+}
+
     getch();
     closegraph();
-	return 0;
+    return 0;
 }
