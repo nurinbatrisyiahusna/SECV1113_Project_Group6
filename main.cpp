@@ -183,7 +183,7 @@ void brandName(int offsetX)
     setcolor(WHITE);
     settextstyle(GOTHIC_FONT, VERT_DIR, 2);
 
-    outtextxy(355 + offsetX, 365, (char*)"COCA-COLA");
+    outtextxy(365 + offsetX, 185, (char*)"COCA-COLA");
 
     setbkcolor(BLACK);        // Restore for the rest of the scene
 }
