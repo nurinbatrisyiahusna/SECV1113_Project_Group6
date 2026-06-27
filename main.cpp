@@ -13,6 +13,7 @@
 #include <cmath>
 #include <string>
 
+typedef float Matrix3x3[3][3];
 bool startAnimation = false;
 int canOffsetX = -500;
 int shakeOffset = 0;
@@ -24,6 +25,15 @@ int iceOffsetY = -450;
 float iceAngle = 0;
 float bubbleScale = 0.0f;
 bool showTagline = false;
+bool taglineBounce = false;
+int taglineOffsetY = 80;
+int bubbleFrame = 0;
+
+
+//! -------------------------------------------------------
+//?     TASK     : MATRIX TRANFORMATION
+//?     MEMBER 1 : TOR SI JIE
+//! -------------------------------------------------------
 
 typedef float Matrix3x3[3][3];
 
@@ -67,6 +77,13 @@ float trigonometricInterpolation(float start, float end, float t) {
     float smoothFactor = (1.0f - cos(t * 3.14159265f)) * 0.5f;
     return start + smoothFactor * (end - start);
 }
+
+
+//! -------------------------------------------------------
+//?     TASK     : 2D TRANSFORMATION, INTERPOLATION
+//?     MEMBER 2 : DHIVYESH KUMAR A/L SIVAKUMAR
+//! -------------------------------------------------------
+
 //Translation
 void translate(Matrix3x3 current, float tx, float ty){
 	Matrix3x3 T;
@@ -113,6 +130,13 @@ void shear(Matrix3x3 current, float shx, float shy){
 
 	multiplyMatrix(current, Sh, current);
 }
+
+
+//! -------------------------------------------------------
+//?     TASK     : DESIGN PRODUCT, ELEMENTS
+//?     MEMBER 3 : NURIN BATRISYIA HUSNA BINTI MOHD HAZRY
+//! -------------------------------------------------------
+
 void shape(int offsetX)
 {
     // Top can
@@ -159,8 +183,7 @@ void brandName(int offsetX)
     setcolor(WHITE);
     settextstyle(GOTHIC_FONT, VERT_DIR, 2);
 
-    outtextxy(355 + offsetX, 280, (char*)"COCA");
-    outtextxy(355 + offsetX, 190, (char*)"COLA");
+    outtextxy(355 + offsetX, 365, (char*)"COCA-COLA");
 
     setbkcolor(BLACK);        // Restore for the rest of the scene
 }
@@ -209,6 +232,29 @@ void bubbles(int offsetX, float scale)
     }
 }
 
+void tagline(int offsetY)
+{
+    setcolor(LIGHTRED);
+    settextstyle(TRIPLEX_FONT, HORIZ_DIR, 2);
+
+    char text[] = "Real Magic - Taste the Feeling!";
+
+    int textWidth = textwidth(text);
+
+    // Center under the can
+    int x = 375 - textWidth / 2;
+    int y = 440 + offsetY;
+
+    outtextxy(x, y, text);
+}
+
+
+//! -------------------------------------------------------
+//?     TASK     : ANIMATION
+//?     MEMBER 4 : NAJWA NAJIBAH BINTI MOHAMAD NOR 
+//! -------------------------------------------------------
+
+
 const float PI = 3.14159265f;
 
 void rotatePoint(int cx, int cy, int &x, int &y, float angle)
@@ -224,6 +270,7 @@ void rotatePoint(int cx, int cy, int &x, int &y, float angle)
     x = newX;
     y = newY;
 }
+
 void drawIceCube(int cx, int cy, int size, float angle)
 {
     int x1 = cx - size;
@@ -257,6 +304,7 @@ void drawIceCube(int cx, int cy, int size, float angle)
 
     fillpoly(5, poly);
 }
+
 void ice(int offsetX, int offsetY, float angle)
 {
     drawIceCube(245 + offsetX,370 + offsetY,15,angle);
@@ -276,21 +324,6 @@ void ice(int offsetX, int offsetY, float angle)
     drawIceCube(372 + offsetX,412 + offsetY,9,-angle);
 }
 
-void tagline()
-{
-    setcolor(LIGHTRED);
-    settextstyle(TRIPLEX_FONT, HORIZ_DIR, 2);
-
-    char text[] = "Real Magic - Taste the Feeling!";
-
-    int textWidth = textwidth(text);
-
-    // Center under the can
-    int x = 375 - textWidth / 2;
-    int y = 440;
-
-    outtextxy(x, y, text);
-}
 void drawScene(int offsetX)
 {
     shape(canOffsetX);
@@ -300,8 +333,9 @@ void drawScene(int offsetX)
 	ice(canOffsetX, iceOffsetY, iceAngle);
 
 	if(showTagline)
-    tagline();
+    tagline(taglineOffsetY);
 }
+
 void startScreen()
 {
     cleardevice();
@@ -309,125 +343,180 @@ void startScreen()
     setcolor(WHITE);
 
     settextstyle(DEFAULT_FONT, HORIZ_DIR, 2);
-    outtextxy(230, 320, (char*)"Press S to Start");
+    outtextxy(260, 320, (char*)"Press S to Start");
 
     settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
-    outtextxy(285, 360, (char*)"Press ESC to Exit");
+    outtextxy(300, 360, (char*)"Press ESC to Exit");
 }
+
+
+
+//? -------------------------------------------------------
+//?     MAIN FUNCTION
+//? -------------------------------------------------------
+
 int main()
 {
     initwindow(800,700);
     srand(time(0));
-
+    int page =0;
     startScreen();
 	
 	while(true)
-{
-    if(kbhit())
     {
-        char key = getch();
-
-        if(key == 's' || key == 'S')
-            break;
-
-        if(key == 27)   // ESC
+        if(kbhit())
         {
-            closegraph();
-            return 0;
-        }
-    }
+            char key = getch();
 
-    delay(20);
-}
+            if(key == 's' || key == 'S')
+                break;
+
+            if(key == 27)   // ESC
+            {
+                closegraph();
+                return 0;
+            }
+        }
+
+        delay(20);
+    }
+    
     while(true)
-{
-    cleardevice();
-
-    // Animation
-    if(stage == 0)
     {
-        canOffsetX += 8;
+        setactivepage(page);
+        cleardevice();
 
-        if(canOffsetX >= 0)
+        // Animation
+        if(stage == 0)
         {
-            canOffsetX = 0;
-            stage = 1;
-        }
-    }else if(stage == 1)
-{
-    if(!strawBounce)
-    {
-        // Falling
-        strawOffsetY += 8;
+            canOffsetX += 8;
 
-        if(strawOffsetY >= 0)
+            if(canOffsetX >= 0)
+            {
+                canOffsetX = 0;
+                stage = 1;
+            }
+        }
+        else if(stage == 1)
         {
-            strawOffsetY = 10;      // Go slightly below
-            strawBounce = true;
-        }
-    }
-    else
-    {
-        // Bounce back up
-        strawOffsetY -= 2;
+            if(!strawBounce)
+            {
+                // Falling
+                strawOffsetY += 8;
 
-        if(strawOffsetY <= 0)
+                if(strawOffsetY >= 0)
+                {
+                    strawOffsetY = 10;      // Go slightly below
+                    strawBounce = true;
+                }
+            }
+            else
+            {
+                // Bounce back up
+                strawOffsetY -= 2;
+
+                if(strawOffsetY <= 0)
+                {
+                    strawOffsetY = 0;
+                    stage = 2;              // Continue to bubbles
+                }
+            }
+
+        }
+        else if(stage == 2)
         {
-            strawOffsetY = 0;
-            stage = 2;              // Continue to bubbles
+            // Shake the can for a short time
+            if(shakeCount < 12)
+            {
+                if(shakeCount % 2 == 0)
+                    shakeOffset = -4;
+                else
+                    shakeOffset = 4;
+
+                shakeCount++;
+            }
+            else
+            {
+                shakeOffset = 0;
+                bubbleFrame++;
+
+                // Start bubble animation
+                bubbleScale += 0.08f;
+
+                if(bubbleFrame >= 3)
+                {
+                    bubbleScale += 0.02f;
+                    bubbleFrame = 0;
+                }
+
+                if(bubbleScale >= 1.2f)
+                {
+                    bubbleScale = 1.2f;
+                    stage = 3;
+                }
+
+                // if(bubbleScale >= 1.2f)
+                // {
+                //     bubbleScale = 1.2f;
+                //     stage = 3;
+                // }
+            }
         }
-    }
-
-}else if(stage == 2)
-{
-    // Shake the can for a short time
-    if(shakeCount < 12)
-    {
-        if(shakeCount % 2 == 0)
-            shakeOffset = -4;
-        else
-            shakeOffset = 4;
-
-        shakeCount++;
-    }
-    else
-    {
-        shakeOffset = 0;
-
-        // Start bubble animation
-        bubbleScale += 0.08f;
-
-        if(bubbleScale >= 1.2f)
+        else if(stage == 3)
         {
-            bubbleScale = 1.2f;
-            stage = 3;
+            iceOffsetY += 6;
+            iceAngle += 8;
+
+            if(iceOffsetY >= 0)
+            {
+                iceOffsetY = 0;
+                showTagline = true;
+                taglineOffsetY = 80;
+                taglineBounce = false;
+                stage = 4;
+            }
         }
+        else if(stage == 4)
+        {
+            if(!taglineBounce)
+            {
+                taglineOffsetY -= 6;
+
+                if(taglineOffsetY <= -10)
+                    taglineBounce = true;
+            }
+            else
+            {
+                taglineOffsetY += 2;
+
+                if(taglineOffsetY >= 0)
+                {
+                    taglineOffsetY = 0;
+                    stage = 5;      // Animation finished
+                }
+            }
+        }
+
+        // Draw objects
+        shape(canOffsetX + shakeOffset);
+        brandName(canOffsetX + shakeOffset);
+        straw(canOffsetX + shakeOffset, strawOffsetY);
+        bubbles(canOffsetX + shakeOffset, bubbleScale);
+        ice(canOffsetX + shakeOffset, iceOffsetY, iceAngle);
+
+        // if(showTagline)
+        // tagline();
+
+        if(showTagline)
+        {
+            tagline(taglineOffsetY);
+        }
+
+        setvisualpage(page);
+        page = 1-page;
+    
+        delay(32);
     }
-}else if(stage == 3)
-{
-    iceOffsetY += 6;
-    iceAngle += 8;
-
-    if(iceOffsetY >= 0)
-    {
-        iceOffsetY = 0;
-        showTagline = true;
-        stage = 4;
-    }
-}
-
-    // Draw objects
-    shape(canOffsetX + shakeOffset);
-	brandName(canOffsetX + shakeOffset);
-	straw(canOffsetX + shakeOffset, strawOffsetY);
-	bubbles(canOffsetX + shakeOffset, bubbleScale);
-	ice(canOffsetX + shakeOffset, iceOffsetY, iceAngle);
-
-	if(showTagline)
-    tagline();
-
-    delay(30);
-}
 
     getch();
     closegraph();
