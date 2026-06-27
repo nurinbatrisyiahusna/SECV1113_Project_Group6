@@ -35,8 +35,6 @@ int bubbleFrame = 0;
 //?     MEMBER 1 : TOR SI JIE
 //! -------------------------------------------------------
 
-typedef float Matrix3x3[3][3];
-
 void setIdentity(Matrix3x3 mat) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
